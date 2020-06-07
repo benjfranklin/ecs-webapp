@@ -70,10 +70,6 @@ module "alb" {
   tags = merge(var.tags, map("service", "alb"))
 }
 
-output "Application_Endpoint_URL" {
-  value = "http://${module.alb.accelerator_dns_name}"
-}
-
 resource "aws_ecs_task_definition" "app" {
   family = "ecs-alb-single-svc"
 
