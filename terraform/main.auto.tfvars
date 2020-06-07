@@ -2,6 +2,8 @@ tags = {
   environment = "dev"
 }
 
+region = "eu-west-2"
+
 vpc_name            = "checkout-lab-vpc"
 vpc_cidr            = "10.0.0.0/16"
 vpc_azs             = ["eu-west-2a", "eu-west-2b", "eu-west-2c"]

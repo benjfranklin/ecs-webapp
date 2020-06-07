@@ -2,6 +2,10 @@ variable "tags" {
     type = map
 }
 
+variable "region" {
+    type = string
+}
+
 variable "vpc_name" {
     type = string
 }
@@ -29,5 +33,16 @@ variable "ecs_cluster_name" {
 variable "alb_name" {
     type = string
 }
+
+variable "alb_ssl_cert_filename" {
+    type = string
+    default = "cert.pem"
+}
+
+variable "alb_ssl_key_filename" {
+    type = string
+    default = "key.pem"
+}
+
 
 
