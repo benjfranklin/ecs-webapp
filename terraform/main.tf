@@ -1,3 +1,29 @@
+resource "aws_ecr_repository" "repository" {
+  name                 = var.docker_image_name
+  image_tag_mutability = "MUTABLE"
+
+  image_scanning_configuration {
+    scan_on_push = true
+  }
+
+}
+
+resource "null_resource" "docker_login" {
+  provisioner "local-exec" {
+    command     = "aws ecr get-login-password --region ${var.region} --no-verify-ssl | docker login --username AWS --password-stdin ${aws_ecr_repository.repository.repository_url}"
+  }
+}
+
+resource "null_resource" "docker_build_push" {
+  provisioner "local-exec" {
+    command     = "./build.sh ./src ${var.docker_image_name} ${aws_ecr_repository.repository.repository_url} ${var.docker_image_tag}"
+    interpreter = ["bash", "-c"]
+  }
+
+  depends_on = [null_resource.docker_login]
+}
+
+
 module "vpc" {
   source  = "terraform-aws-modules/vpc/aws"
   version = "~> 2.38.0"
@@ -9,7 +35,7 @@ module "vpc" {
   private_subnets = var.vpc_private_subnets
   public_subnets  = var.vpc_public_subnets
 
-  enable_nat_gateway = false
+  enable_nat_gateway = true
   enable_vpn_gateway = false
 
   tags = merge(var.tags, map("service", "vpc"))
@@ -54,8 +80,8 @@ resource "aws_ecs_task_definition" "app" {
   container_definitions = <<EOF
 [
   {
-    "name": "nginx",
-    "image": "nginx:1.13-alpine",
+    "name": "${var.docker_image_name}",
+    "image": "${aws_ecr_repository.repository.repository_url}:${var.docker_image_tag}",
     "essential": true,
     "portMappings": [
       {
@@ -65,7 +91,7 @@ resource "aws_ecs_task_definition" "app" {
     "logConfiguration": {
       "logDriver": "awslogs",
       "options": {
-        "awslogs-group": "ecs-alb-single-svc-nginx",
+        "awslogs-group": "ecs-alb-single-svc-${var.docker_image_name}",
         "awslogs-region": "${var.region}"
       }
     },
@@ -76,16 +102,15 @@ resource "aws_ecs_task_definition" "app" {
 EOF
 }
 
-
 module "ecs_service_app" {
   source = "./modules/service"
 
   name                 = "checkout-lab-app"
   alb_target_group_arn = module.alb.target_group_arn
   cluster              = module.ecs_cluster.cluster_id
-  container_name       = "nginx"
+  container_name       = "${var.docker_image_name}"
   container_port       = "80"
-  log_groups           = ["ecs-alb-single-svc-nginx"]
+  log_groups           = ["ecs-alb-single-svc-${var.docker_image_name}"]
   task_definition_arn  = aws_ecs_task_definition.app.arn
 
   tags = merge(var.tags, map("service","app"))

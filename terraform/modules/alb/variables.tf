@@ -18,10 +18,15 @@ variable "backend_sg_id" {
   type = string
 }
 
-variable "log_bucket_name" {
+variable "ssl_certificate_arn" {
   description = ""
   type = string
 }
+
+/* variable "log_bucket_name" {
+  description = ""
+  type = string
+} */
 
 variable "tags" {
   description = ""

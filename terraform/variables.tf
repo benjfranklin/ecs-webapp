@@ -6,6 +6,20 @@ variable "region" {
     type = string
 }
 
+variable "account_id" {
+  type = string
+}
+
+variable "docker_image_name" {
+  description = "Name to use for deployed Docker image"
+  default = "webserver"
+}
+
+variable "docker_image_tag" {
+  description = "Tag to use for deployed Docker image"
+  default     = "latest"
+}
+
 variable "vpc_name" {
     type = string
 }

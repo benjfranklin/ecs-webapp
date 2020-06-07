@@ -2,7 +2,11 @@ tags = {
   environment = "dev"
 }
 
-region = "eu-west-2"
+account_id = "776475658441"
+region     = "eu-west-2"
+
+docker_image_name = "webserver"
+docker_image_tag  = "latest"
 
 vpc_name            = "checkout-lab-vpc"
 vpc_cidr            = "10.0.0.0/16"

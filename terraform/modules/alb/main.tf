@@ -46,7 +46,7 @@ resource "aws_security_group_rule" "ecs_instance_ingress_permit_alb" {
 }
 
 resource "aws_s3_bucket" "log_bucket" {
-  bucket = var.log_bucket_name
+  bucket = "${var.name}-logs"
   acl    = "private"
 
   tags        = var.tags

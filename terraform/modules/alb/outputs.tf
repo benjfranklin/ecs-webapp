@@ -10,7 +10,7 @@ output "listener_http_arn" {
 
 output "target_group_arns" {
   description = "ARN of the target group"
-  value       = module.alb.target_group_arns
+  value       = module.alb.target_group_arns[0]
 }
 
 output "accelerator_dns_name" {
