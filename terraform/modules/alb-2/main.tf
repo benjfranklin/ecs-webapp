@@ -18,14 +18,14 @@ resource "aws_security_group_rule" "alb_ingress_permit_https_any" {
   security_group_id = aws_security_group.alb.id
 }
 
-resource "aws_security_group_rule" "alb_ingress_permit_http_any" {
+/* resource "aws_security_group_rule" "alb_ingress_permit_http_any" {
   type              = "ingress"
   from_port         = 80
   to_port           = 80
   protocol          = "tcp"
   cidr_blocks       = ["0.0.0.0/0"]
   security_group_id = aws_security_group.alb.id
-}
+} */
 
 resource "aws_security_group_rule" "alb_egress_permit_tcp_any" {
   type              = "egress"
@@ -46,7 +46,7 @@ resource "aws_security_group_rule" "ecs_instance_ingress_permit_alb" {
 }
 
 resource "aws_s3_bucket" "log_bucket" {
-  bucket = "${var.name}-logs"
+  bucket = "${var.name}-alb-logs"
   acl    = "private"
 
   tags        = var.tags
@@ -78,22 +78,22 @@ module "alb" {
     }
   ]
 
- /*  https_listeners = [
+ https_listeners = [
     {
       port               = 443
       protocol           = "HTTPS"
-      certificate_arn    = "arn:aws:iam::123456789012:server-certificate/test_cert-123456789012"
+      certificate_arn    = var.ssl_certificate_arn
       target_group_index = 0
     }
-  ] */
+  ]
 
-  http_tcp_listeners = [
+  /* http_tcp_listeners = [
     {
       port               = 80
       protocol           = "HTTP"
       target_group_index = 0
     }
-  ]
+  ] */
 
   tags = var.tags
 }
@@ -104,17 +104,12 @@ resource "aws_globalaccelerator_accelerator" "alb" {
   ip_address_type = "IPV4"
   enabled         = true
 
-  /* attributes {
-    flow_logs_enabled   = true
-    flow_logs_s3_bucket = "example-bucket"
-    flow_logs_s3_prefix = "flow-logs/"
-  } */
 }
 
 resource "aws_globalaccelerator_endpoint_group" "alb" {
   listener_arn = aws_globalaccelerator_listener.alb.id
   health_check_path = "/"
-  health_check_port = 80
+  health_check_port = 443
 
 
   endpoint_configuration {
@@ -129,7 +124,7 @@ resource "aws_globalaccelerator_listener" "alb" {
   protocol        = "TCP"
 
   port_range {
-    from_port = 80
-    to_port   = 80
+    from_port = 443
+    to_port   = 443
   }
 }
