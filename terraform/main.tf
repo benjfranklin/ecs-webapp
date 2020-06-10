@@ -1,4 +1,4 @@
-resource "aws_ecr_repository" "repository" {
+/* resource "aws_ecr_repository" "repository" {
   name                 = var.docker_image_name
   image_tag_mutability = "MUTABLE"
 
@@ -112,3 +112,4 @@ module "ecs_service_app" {
   tags = merge(var.tags, map("service","app"))
 }
 
+ */
