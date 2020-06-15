@@ -37,4 +37,4 @@ Application_Endpoint_URL = https://<hostname>.awsglobalaccelerator.com
 ```
 The URL can be opened in a browser to verify that the application has been successfully deployed
 
-*Note: The deployment does not create or manage AWS Route53 or similar DNS records and as such to complete the deployment one would need create a CNAME entry on a valid hosted DNS zone (as depicted in the diagram) to finalize the deployment.*
+*Note: The deployment does not create or manage AWS Route53 or similar DNS records and as such to properly implement the hosted solution one would need to create a CNAME entry on a valid hosted DNS zone (as depicted in the diagram). The Global Application Accelerator URL should however be sufficient for testing purposes.*
