@@ -1,17 +1,19 @@
+# Module to create AWS Elastic Container Service (ECS) cluster
+
 terraform {
   required_version = ">= 0.12"
 }
 
 resource "aws_ecs_cluster" "ecs_cluster" {
-  name = "${var.name}-ecs-cluster"
+  name = "${var.vpc_name}-${var.name}-ecs-cluster"
 }
 
 resource "aws_cloudwatch_log_group" "ecs_instance" {
-  name = var.instance_log_group != "" ? var.instance_log_group : format("%s-instance", var.name)
-  tags = merge(var.tags, map("Name", format("%s", var.name)))
+  name = var.instance_log_group != "" ? var.instance_log_group : format("%s-instance", "${var.vpc_name}-${var.name}-ecs")
+  tags        = var.tags
 }
 
-/* data "aws_iam_policy_document" "instance_policy" {
+data "aws_iam_policy_document" "instance_policy" {
   statement {
     sid = "CloudwatchPutMetricData"
 
@@ -35,17 +37,16 @@ resource "aws_cloudwatch_log_group" "ecs_instance" {
     ]
 
     resources = [
-      "${aws_cloudwatch_log_group.instance.arn}",
+      aws_cloudwatch_log_group.ecs_instance.arn
     ]
   }
 }
 
 resource "aws_iam_policy" "instance_policy" {
-  name   = "${var.name}-instance"
+  name   = "${var.vpc_name}-${var.name}-ecs-instance-policy"
   path   = "/"
-  policy = "${data.aws_iam_policy_document.instance_policy.json}"
-}
-*/
+  policy = data.aws_iam_policy_document.instance_policy.json
+} 
 
 resource "aws_iam_role" "ecs_instance" {
   name = "${var.name}-ecs-instance-role"
@@ -72,10 +73,10 @@ resource "aws_iam_role_policy_attachment" "ecs_policy" {
   policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonEC2ContainerServiceforEC2Role"
 }
 
-/* resource "aws_iam_role_policy_attachment" "instance_policy" {
-  role       = "${aws_iam_role.instance.name}"
-  policy_arn = "${aws_iam_policy.instance_policy.arn}"
-} */
+resource "aws_iam_role_policy_attachment" "instance_policy" {
+  role       = aws_iam_role.ecs_instance.name
+  policy_arn = aws_iam_policy.instance_policy.arn
+}
 
 resource "aws_iam_instance_profile" "ecs_instance" {
   name = "${var.name}-ecs-instance-profile"
@@ -83,10 +84,10 @@ resource "aws_iam_instance_profile" "ecs_instance" {
 }
 
 resource "aws_security_group" "ecs_instance" {
-  name        = "${var.name}-ecs-instance-sg"
+  name        = "${var.vpc_name}-${var.name}-ecs-instance-sg"
   description = "Security Group managed by Terraform"
   vpc_id      = var.vpc_id
-  tags        = merge(var.tags, map("Name", format("%s-container-instance", var.name)))
+  tags        = var.tags
 }
 
 resource "aws_security_group_rule" "ecs_instance_egress_permit_any" {
@@ -131,7 +132,7 @@ resource "aws_key_pair" "user" {
 }
 
 resource "aws_launch_configuration" "ecs_instance" {
-  name_prefix          = "${var.name}-ecs-lc"
+  name_prefix          = "${var.vpc_name}-${var.name}-ecs-lc"
   image_id             = var.image_id != "" ? var.image_id : data.aws_ami.ecs_instance.id
   instance_type        = var.instance_type
   iam_instance_profile = aws_iam_instance_profile.ecs_instance.name
@@ -150,7 +151,7 @@ resource "aws_launch_configuration" "ecs_instance" {
 }
 
 resource "aws_autoscaling_group" "asg" {
-  name = "${var.name}-ecs-asg"
+  name = "${var.vpc_name}-${var.name}-ecs-asg"
 
   launch_configuration = aws_launch_configuration.ecs_instance.name
   vpc_zone_identifier  = var.vpc_subnets

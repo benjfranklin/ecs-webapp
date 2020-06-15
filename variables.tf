@@ -6,18 +6,8 @@ variable "region" {
     type = string
 }
 
-variable "account_id" {
+variable "application_name" {
   type = string
-}
-
-variable "docker_image_name" {
-  description = "Name to use for deployed Docker image"
-  default = "webserver"
-}
-
-variable "docker_image_tag" {
-  description = "Tag to use for deployed Docker image"
-  default     = "latest"
 }
 
 variable "vpc_name" {
@@ -58,5 +48,12 @@ variable "alb_ssl_key_filename" {
     default = "key.pem"
 }
 
+variable "docker_image_name" {
+  description = "Name to use for deployed Docker image"
+  default = "webserver"
+}
 
-
+variable "docker_image_tag" {
+  description = "Tag to use for deployed Docker image"
+  default     = "latest"
+}
