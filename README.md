@@ -16,7 +16,15 @@ The diagram below describes the resultant deployment architecture in AWS.
 5. Docker [installed](https://docs.docker.com/get-docker/).
 
 ## Usage
-Ensure the above pre-requisties have been met. You can also optionally edit the contents of ./src/www to host your own web-page instead of using the example provided. Thereafter, run the following commands from your console of choice:
+### Optional
+The following are **optional** steps:
+1. Edit the contents of ./src/www to host your own web-page instead of using the example HTML web page contents.
+2. Edit the main.auto.tfvars to reflect your own requirements
+
+### Required
+The following are **mandatory** steps:
+1. Ensure the above pre-requisties have been met.
+2. Run the following commands in your terraform console:
 ```
 $ terraform init
 $ terraform plan 
