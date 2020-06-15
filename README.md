@@ -20,7 +20,7 @@ The diagram below describes the resultant deployment architecture in AWS.
 The following are **optional** steps:
 1. Edit the contents of ./src/www to host your own web-page instead of using the example HTML web page contents.
 2. Replace the certificate files in ./ssl with your own (valid) ssl certificate files.
-3. Edit the main.auto.tfvars to reflect your own requirements.
+3. Edit *main.auto.tfvars* to reflect your own requirements.
 
 ### Required
 The following are **mandatory** steps:
